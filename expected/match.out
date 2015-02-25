@@ -1,0 +1,69 @@
+SELECT
+   code,
+   qry,
+   code % qry AS match,
+   code % qry = expect AS pass
+FROM (
+   VALUES
+   ('EC4Y 0HQ'::postcode, '',           false),
+   ('EC4Y 0HQ'::postcode, 'EC4Y 0HQ',   true),
+   ('EC4Y 0HQ'::postcode, 'EC4Y 0',     true),
+   ('EC4Y 0HQ'::postcode, 'EC4Y ',      true),
+   ('EC4Y 0HQ'::postcode, 'EC4Y',       true),
+   ('EC4Y 0HQ'::postcode, 'EC',         true),
+   ('EC4Y 0HQ'::postcode, ' EC4Y 0HQ ', false),
+   ('EC4Y 0HQ'::postcode, 'EC4Y 0HQ ',  false),
+   ('EC4Y 0HQ'::postcode, 'EC4Y 0H ',   false),
+   ('EC4Y 0HQ'::postcode, 'EC4 ',       false),
+   ('EC4Y 0HQ'::postcode, 'EC4',        false),
+   ('EC4Y 0HQ'::postcode, 'EC4 0',      false),
+   ('EC4Y 0HQ'::postcode, 'EC4 0HQ',    false),
+   ('EC4Y 0HQ'::postcode, 'E4 0HQ',     false),
+   ('EC4Y 0HQ'::postcode, 'E',          false),
+   ('EC4Y 0HQ'::postcode, 'E ',         false),
+   ('EC40 1AB'::postcode, 'EC40 1AB',   true),
+   ('EC40 1AB'::postcode, 'EC40 1',     true),
+   ('EC40 1AB'::postcode, 'EC40 ',      true),
+   ('EC40 1AB'::postcode, 'EC40',       true),
+   ('EC40 1AB'::postcode, 'EC',         true),
+   ('EC40 1AB'::postcode, 'EC4',        false),
+   ('EC40 1AB'::postcode, 'EC4 ',       false),
+   ('EC40 1AB'::postcode, 'EC41',       false),
+   ('EC40 1AB'::postcode, 'EC4 1',      false),
+   ('EC40 1AB'::postcode, 'EH',         false),
+   ('EC40 1AB'::postcode, 'EH4',        false),
+   ('EC40 1AB'::postcode, 'EH40',       false)
+) AS sample (code, qry, expect)
+ORDER BY code % qry = expect ASC
+   code   |    qry     | match | pass 
+----------+------------+-------+------
+ EC4Y 0HQ |            | f     | t
+ EC4Y 0HQ | EC4Y 0HQ   | t     | t
+ EC4Y 0HQ | EC4Y 0     | t     | t
+ EC4Y 0HQ | EC4Y       | t     | t
+ EC4Y 0HQ | EC4Y       | t     | t
+ EC4Y 0HQ | EC         | t     | t
+ EC4Y 0HQ |  EC4Y 0HQ  | f     | t
+ EC4Y 0HQ | EC4Y 0HQ   | f     | t
+ EC4Y 0HQ | EC4Y 0H    | f     | t
+ EC4Y 0HQ | EC4        | f     | t
+ EC4Y 0HQ | EC4        | f     | t
+ EC4Y 0HQ | EC4 0      | f     | t
+ EC4Y 0HQ | EC4 0HQ    | f     | t
+ EC4Y 0HQ | E4 0HQ     | f     | t
+ EC4Y 0HQ | E          | f     | t
+ EC4Y 0HQ | E          | f     | t
+ EC40 1AB | EC40 1AB   | t     | t
+ EC40 1AB | EC40 1     | t     | t
+ EC40 1AB | EC40       | t     | t
+ EC40 1AB | EC40       | t     | t
+ EC40 1AB | EC         | t     | t
+ EC40 1AB | EC4        | f     | t
+ EC40 1AB | EC4        | f     | t
+ EC40 1AB | EC41       | f     | t
+ EC40 1AB | EC4 1      | f     | t
+ EC40 1AB | EH         | f     | t
+ EC40 1AB | EH4        | f     | t
+ EC40 1AB | EH40       | f     | t
+(28 rows)
+
