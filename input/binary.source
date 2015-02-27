@@ -1,0 +1,3 @@
+CREATE TABLE bintest (p postcode, d dps);
+\copy bintest FROM '@abs_srcdir@/data/binary.data' WITH BINARY;
+SELECT * FROM bintest;

@@ -110,8 +110,8 @@ bool postcode_binchk (postcode p) {
    // [0-9]
    if (GET_DISTRICT1(p) < 1 || GET_DISTRICT1(p) > 11) return false;
 
-   // [A-Z0-9] excluding intervening codes [:;<=>?@]
-   if (GET_DISTRICT2(p) <  1 || GET_DISTRICT2(p) > 43) return false;
+   // empty (== 0) or [A-Z0-9] excluding intervening codes [:;<=>?@]
+   if (GET_DISTRICT2(p) > 43) return false;
    if (GET_DISTRICT2(p) > 11 && GET_DISTRICT2(p) < 18) return false;
 
    // Do not allow district 00
