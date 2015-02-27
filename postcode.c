@@ -152,6 +152,7 @@ Datum postcode_cmp_partial (PG_FUNCTION_ARGS) {
    postcode b = postcode_parse(text_to_cstring(PG_GETARG_TEXT_P(1)), true);
    postcode a = postcode_mask(PG_GETARG_POSTCODE(0), b);
 
+   if (b == 0) PG_RETURN_INT32(-1); // invalid postcode fragment
    if (a == b) PG_RETURN_INT32( 0);
    if (a >  b) PG_RETURN_INT32( 1);
    else        PG_RETURN_INT32(-1);

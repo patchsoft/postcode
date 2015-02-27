@@ -1,0 +1,54 @@
+SELECT
+   code,
+   partial,
+   expect,
+   postcode_cmp_partial(code::postcode, partial::text) AS result,
+   postcode_cmp_partial(code::postcode, partial::text) = expect AS pass
+FROM (VALUES
+   ('BA1 1AZ', 'BA1 1AZ',  0),
+   ('BA1 1AZ', 'BA1 1A',  -1), -- invalid postcode fragment sorts last
+   ('BA1 1AZ', 'BA1 1',    0),
+   ('BA1 1AZ', 'BA1',      0),
+   ('BA1 1AZ', 'BA',       0),
+   ('BA1 1AZ', 'B',        1), -- area is not complete match
+   ('BA1 1AZ', '',        -1), -- invalid postcode fragment sorts last
+   ('BA1 1AZ', 'BA-',     -1),
+   ('BA1 1AZ', NULL,    NULL),
+   (NULL,      'BA1',   NULL),
+   (NULL,      NULL,    NULL),
+   ('BA1 1AZ', 'BA10',    -1), -- district 1 sorts before district 10
+   ('BA1 1AZ', 'BA11',    -1), -- chars allocated to district not sector
+   ('BA1 1AZ', 'BA1A1',   -1), -- equivalent to district BA1A, sector 1
+   ('BA1 1AZ', 'BA1 1',    0), -- with space chars allocated to sector
+   ('BA1 1AZ', 'BA1 0',    1),
+   ('BA1 1AZ', 'AB1 1AZ',  1),
+   ('BA1 1AZ', 'B1 1AZ',   1),
+   ('BA1 1AZ', 'BB1 1AZ', -1),
+   ('BA1 1AZ', 'CA1 1AZ', -1),
+   ('BA1 1AZ', 'G1 1AZ',  -1)
+) AS sample (code, partial, expect);
+  code   | partial | expect | result | pass 
+---------+---------+--------+--------+------
+ BA1 1AZ | BA1 1AZ |      0 |      0 | t
+ BA1 1AZ | BA1 1A  |     -1 |     -1 | t
+ BA1 1AZ | BA1 1   |      0 |      0 | t
+ BA1 1AZ | BA1     |      0 |      0 | t
+ BA1 1AZ | BA      |      0 |      0 | t
+ BA1 1AZ | B       |      1 |      1 | t
+ BA1 1AZ |         |     -1 |     -1 | t
+ BA1 1AZ | BA-     |     -1 |     -1 | t
+ BA1 1AZ |         |        |        | 
+         | BA1     |        |        | 
+         |         |        |        | 
+ BA1 1AZ | BA10    |     -1 |     -1 | t
+ BA1 1AZ | BA11    |     -1 |     -1 | t
+ BA1 1AZ | BA1A1   |     -1 |     -1 | t
+ BA1 1AZ | BA1 1   |      0 |      0 | t
+ BA1 1AZ | BA1 0   |      1 |      1 | t
+ BA1 1AZ | AB1 1AZ |      1 |      1 | t
+ BA1 1AZ | B1 1AZ  |      1 |      1 | t
+ BA1 1AZ | BB1 1AZ |     -1 |     -1 | t
+ BA1 1AZ | CA1 1AZ |     -1 |     -1 | t
+ BA1 1AZ | G1 1AZ  |     -1 |     -1 | t
+(21 rows)
+
