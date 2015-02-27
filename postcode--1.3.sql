@@ -166,3 +166,134 @@ FOR TYPE postcode USING btree FAMILY postcode_ops AS
 
    OPERATOR 3 %  (postcode, text),
    FUNCTION 1 postcode_cmp_partial(postcode, text);
+
+
+CREATE TYPE dps;
+
+CREATE FUNCTION dps_in(cstring)
+   RETURNS dps
+   AS 'MODULE_PATHNAME'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION dps_out(dps)
+   RETURNS cstring
+   AS 'MODULE_PATHNAME'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION dps_recv(internal)
+   RETURNS dps
+   AS 'MODULE_PATHNAME'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION dps_send(dps)
+   RETURNS bytea
+   AS 'MODULE_PATHNAME'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE TYPE dps (
+   INPUT          = dps_in,
+   OUTPUT         = dps_out,
+   RECEIVE        = dps_recv,
+   SEND           = dps_send,
+   CATEGORY       = 'S',
+   INTERNALLENGTH = 1,
+   ALIGNMENT      = char,
+   PASSEDBYVALUE
+);
+
+CREATE FUNCTION dps_validate(text)
+   RETURNS boolean
+   AS 'MODULE_PATHNAME'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION dps_cmp(dps, dps)
+   RETURNS integer
+   AS 'MODULE_PATHNAME'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION dps_eq(dps, dps)
+   RETURNS boolean
+   AS 'MODULE_PATHNAME'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION dps_ne(dps, dps)
+   RETURNS boolean
+   AS 'MODULE_PATHNAME'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION dps_lt(dps, dps)
+   RETURNS boolean
+   AS 'MODULE_PATHNAME'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION dps_gt(dps, dps)
+   RETURNS boolean
+   AS 'MODULE_PATHNAME'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION dps_lte(dps, dps)
+   RETURNS boolean
+   AS 'MODULE_PATHNAME'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION dps_gte(dps, dps)
+   RETURNS boolean
+   AS 'MODULE_PATHNAME'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OPERATOR = (
+   PROCEDURE  = dps_eq,
+   LEFTARG    = dps,
+   RIGHTARG   = dps,
+   COMMUTATOR = =,
+   NEGATOR    = <>,
+   RESTRICT   = eqsel,
+   JOIN       = eqjoinsel);
+
+CREATE OPERATOR <> (
+   PROCEDURE  = dps_ne,
+   LEFTARG    = dps,
+   RIGHTARG   = dps,
+   COMMUTATOR = <>,
+   NEGATOR    = =,
+   RESTRICT   = neqsel,
+   JOIN       = neqjoinsel);
+
+CREATE OPERATOR < (
+   PROCEDURE  = dps_lt,
+   LEFTARG    = dps,
+   RIGHTARG   = dps,
+   COMMUTATOR = >,
+   NEGATOR    = >=);
+
+CREATE OPERATOR > (
+   PROCEDURE  = dps_gt,
+   LEFTARG    = dps,
+   RIGHTARG   = dps,
+   COMMUTATOR = <,
+   NEGATOR    = <=);
+
+CREATE OPERATOR <= (
+   PROCEDURE  = dps_lte,
+   LEFTARG    = dps,
+   RIGHTARG   = dps,
+   COMMUTATOR = >=,
+   NEGATOR    = >);
+
+CREATE OPERATOR >= (
+   PROCEDURE  = dps_gte,
+   LEFTARG    = dps,
+   RIGHTARG   = dps,
+   COMMUTATOR = <=,
+   NEGATOR    = <);
+
+CREATE OPERATOR FAMILY dps_ops USING btree;
+
+CREATE OPERATOR CLASS dps_ops
+DEFAULT FOR TYPE dps USING btree FAMILY dps_ops AS
+   OPERATOR 1 <,
+   OPERATOR 2 <=,
+   OPERATOR 3 =,
+   OPERATOR 4 >=,
+   OPERATOR 5 >,
+   FUNCTION 1 dps_cmp(dps, dps);

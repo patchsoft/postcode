@@ -12,6 +12,9 @@ PG_MODULE_MAGIC;
 #define PG_RETURN_POSTCODE(p) return Int32GetDatum(p)
 #define PG_GETARG_POSTCODE(n) DatumGetInt32(PG_GETARG_DATUM(n))
 
+#define PG_RETURN_DPS(p)      return UInt8GetDatum(p)
+#define PG_GETARG_DPS(n)      DatumGetUInt8(PG_GETARG_DATUM(n))
+
 Datum postcode_in             (PG_FUNCTION_ARGS);
 Datum postcode_out            (PG_FUNCTION_ARGS);
 Datum postcode_recv           (PG_FUNCTION_ARGS);
@@ -27,6 +30,19 @@ Datum postcode_gte            (PG_FUNCTION_ARGS);
 Datum postcode_cmp_partial    (PG_FUNCTION_ARGS);
 Datum postcode_eq_partial     (PG_FUNCTION_ARGS);
 Datum postcode_ne_partial     (PG_FUNCTION_ARGS);
+
+Datum dps_in                  (PG_FUNCTION_ARGS);
+Datum dps_out                 (PG_FUNCTION_ARGS);
+Datum dps_recv                (PG_FUNCTION_ARGS);
+Datum dps_send                (PG_FUNCTION_ARGS);
+Datum dps_validate            (PG_FUNCTION_ARGS);
+Datum dps_cmp                 (PG_FUNCTION_ARGS);
+Datum dps_eq                  (PG_FUNCTION_ARGS);
+Datum dps_ne                  (PG_FUNCTION_ARGS);
+Datum dps_lt                  (PG_FUNCTION_ARGS);
+Datum dps_gt                  (PG_FUNCTION_ARGS);
+Datum dps_lte                 (PG_FUNCTION_ARGS);
+Datum dps_gte                 (PG_FUNCTION_ARGS);
 
 __attribute__((warn_unused_result))
 static inline postcode postcode_mask (postcode a, postcode b) {
@@ -210,4 +226,112 @@ Datum postcode_to_char (PG_FUNCTION_ARGS) {
    *b = '\0';
 
    PG_RETURN_TEXT_P(cstring_to_text(buf));
+}
+
+
+PG_FUNCTION_INFO_V1(dps_in);
+
+Datum dps_in (PG_FUNCTION_ARGS) {
+   dps d = postcode_dps_parse(PG_GETARG_CSTRING(0));
+
+   if (d == 0)
+      ereport(ERROR, (errcode(ERRCODE_INVALID_TEXT_REPRESENTATION),
+                      errmsg (_("cannot parse input for type dps"))));
+
+   PG_RETURN_DPS(d);
+}
+
+
+PG_FUNCTION_INFO_V1(dps_out);
+
+Datum dps_out (PG_FUNCTION_ARGS) {
+   char *str = palloc(3);
+   postcode_dps_render(PG_GETARG_DPS(0), str);
+   PG_RETURN_CSTRING(str);
+}
+
+
+PG_FUNCTION_INFO_V1(dps_recv);
+
+Datum dps_recv (PG_FUNCTION_ARGS) {
+   dps d = pq_getmsgint((StringInfo) PG_GETARG_POINTER(0), sizeof(dps));
+
+   if (! postcode_dps_binchk(d))
+      ereport(ERROR, (errcode(ERRCODE_INVALID_BINARY_REPRESENTATION),
+                      errmsg (_("received binary data is invalid for type dps")),
+                      errhint(_("server binary format version is %s"), STR(EXTVERSION))));
+
+   PG_RETURN_DPS(d);
+}
+
+
+PG_FUNCTION_INFO_V1(dps_send);
+
+Datum dps_send (PG_FUNCTION_ARGS) {
+   StringInfoData b;
+   pq_begintypsend(&b);
+   pq_sendint(&b, PG_GETARG_DPS(0), sizeof(dps));
+   PG_RETURN_BYTEA_P(pq_endtypsend(&b));
+}
+
+
+PG_FUNCTION_INFO_V1(dps_validate);
+
+Datum dps_validate (PG_FUNCTION_ARGS) {
+   dps d = postcode_dps_parse(text_to_cstring(PG_GETARG_TEXT_P(0)));
+   PG_RETURN_BOOL(d ? TRUE : FALSE);
+}
+
+
+PG_FUNCTION_INFO_V1(dps_cmp);
+
+Datum dps_cmp (PG_FUNCTION_ARGS) {
+   dps a = PG_GETARG_DPS(0),
+       b = PG_GETARG_DPS(1);
+
+   if (a == b) PG_RETURN_INT32( 0);
+   if (a >  b) PG_RETURN_INT32( 1);
+   else        PG_RETURN_INT32(-1);
+}
+
+
+PG_FUNCTION_INFO_V1(dps_eq);
+
+Datum dps_eq (PG_FUNCTION_ARGS) {
+   PG_RETURN_BOOL(PG_GETARG_DPS(0) == PG_GETARG_DPS(1));
+}
+
+
+PG_FUNCTION_INFO_V1(dps_ne);
+
+Datum dps_ne (PG_FUNCTION_ARGS) {
+   PG_RETURN_BOOL(PG_GETARG_DPS(0) != PG_GETARG_DPS(1));
+}
+
+
+PG_FUNCTION_INFO_V1(dps_lt);
+
+Datum dps_lt (PG_FUNCTION_ARGS) {
+   PG_RETURN_BOOL(PG_GETARG_DPS(0) < PG_GETARG_DPS(1));
+}
+
+
+PG_FUNCTION_INFO_V1(dps_gt);
+
+Datum dps_gt (PG_FUNCTION_ARGS) {
+   PG_RETURN_BOOL(PG_GETARG_DPS(0) > PG_GETARG_DPS(1));
+}
+
+
+PG_FUNCTION_INFO_V1(dps_lte);
+
+Datum dps_lte (PG_FUNCTION_ARGS) {
+   PG_RETURN_BOOL(PG_GETARG_DPS(0) <= PG_GETARG_DPS(1));
+}
+
+
+PG_FUNCTION_INFO_V1(dps_gte);
+
+Datum dps_gte (PG_FUNCTION_ARGS) {
+   PG_RETURN_BOOL(PG_GETARG_DPS(0) >= PG_GETARG_DPS(1));
 }

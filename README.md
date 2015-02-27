@@ -58,6 +58,22 @@ an equivalent index on a column of type text. This may give a performance
 advantage where the index can therefore be held entirely within memory.
 
 
+Delivery point suffixes
+-----------------------
+For any postcode there is a maximum of 175 delivery points, each of which
+is allocated a suffix of the form [1-9][A-Z] with the characters CIKMOV not
+used. Suffixes follow the sequence 1A, 1B, 1C through to 9T. Codes 9U-9Z
+are for use by applications as defaults where the correct suffix is unknown.
+
+A suitable type (dps) is provided which encodes into one byte all possible
+values, including codes 9U-9Z. Parsing is case insensitive but output is
+always in upper case.
+
+The type aims to provide strict validation rather than space efficiency,
+although some small storage savings can be made compared to char(2) if
+careful ordering of columns is made with respect to alignment.
+
+
 Binary format
 -------------
 For client applications exchanging results in binary format the functions

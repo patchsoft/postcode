@@ -3,6 +3,7 @@
 
 #include "binfmt.h"
 #include "postcode.h"
+#include "dps.h"
 
 // maximum number of characters to attempt to parse
 #define POSTCODE_PARSE_LIMIT 32
@@ -124,4 +125,28 @@ bool postcode_binchk (postcode p) {
    if (GET_WALK2(p) < 1 || GET_WALK2(p) > 27) return false;
 
    return true;
+}
+
+
+dps postcode_dps_parse (const char *str) {
+   if (! (str && strnlen(str, 3) == 2)) return 0;
+   char key[3] = { 0 };
+   memcpy(key, str, 2);
+   if (key[1] >= 'a' && key[1] <= 'z') key[1] -= 32; // tr/[a-z]/[A-Z/
+   char *d = bsearch(key, dpsuffix, N_ELEMS(dpsuffix), sizeof(char *), bcmp_ptr);
+   if (!d) return 0;
+   return ((char **) d) - ((char **) dpsuffix) + 1;
+}
+
+
+int postcode_dps_render (dps d, char buf[3]) {
+   if (! postcode_dps_binchk(d)) return 0;
+   memcpy(buf, dpsuffix[d-1], 2);
+   buf[2] = '\0';
+   return 2;
+}
+
+
+bool postcode_dps_binchk (dps d) {
+   return d <= N_ELEMS(dpsuffix);
 }
