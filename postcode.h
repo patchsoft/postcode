@@ -36,6 +36,7 @@
 #define MASK_DISTRICT(p)   CLR_BITS(p, 0, 24)
 
 // write 1 or 2 chars to buffer and advance pointer
+// WRITE_AREA() may need prior call to postcode_binchk() to ensure index validity
 #define WRITE_AREA(b,p) do { b = stpncpy(b, areas[GET_AREA(p)-1], 2); } while(0)
 
 #define WRITE_DISTRICT(b,p) do { *(b++) = GET_DISTRICT1(p) + 47; \

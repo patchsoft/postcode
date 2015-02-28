@@ -90,6 +90,8 @@ postcode postcode_parse (const char *str, bool partial) {
 
 
 int postcode_render (postcode p, char buf[8]) {
+   if (! postcode_binchk(p)) return 0;
+
    char *b = buf;
 
    WRITE_AREA(b,p);

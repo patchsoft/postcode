@@ -71,7 +71,11 @@ PG_FUNCTION_INFO_V1(postcode_out);
 
 Datum postcode_out (PG_FUNCTION_ARGS) {
    char *str = palloc(8);
-   postcode_render(PG_GETARG_POSTCODE(0), str);
+
+   if (postcode_render(PG_GETARG_POSTCODE(0), str) == 0)
+      ereport(ERROR, (errcode(ERRCODE_DATA_CORRUPTED),
+                      errmsg (_("cannot render corrupted binary data to text"))));
+
    PG_RETURN_CSTRING(str);
 }
 
@@ -204,6 +208,10 @@ Datum postcode_to_char (PG_FUNCTION_ARGS) {
    text  *txt = PG_GETARG_TEXT_P(1);
    char  *str = VARDATA(txt);
    size_t len = VARSIZE(txt) - VARHDRSZ;
+
+   if (! postcode_binchk(p))
+      ereport(ERROR, (errcode(ERRCODE_DATA_CORRUPTED),
+                      errmsg (_("cannot render corrupted binary data to text"))));
 
    // each template pattern expands to a maximum of two characters
    if (len >= SIZE_MAX/2)
