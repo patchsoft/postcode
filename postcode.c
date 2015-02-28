@@ -9,8 +9,8 @@ PG_MODULE_MAGIC;
 #include "postcode.h"
 #include "binfmt.h"
 
-#define PG_RETURN_POSTCODE(p) return Int32GetDatum(p)
-#define PG_GETARG_POSTCODE(n) DatumGetInt32(PG_GETARG_DATUM(n))
+#define PG_RETURN_POSTCODE(p) return UInt32GetDatum(p)
+#define PG_GETARG_POSTCODE(n) DatumGetUInt32(PG_GETARG_DATUM(n))
 
 #define PG_RETURN_DPS(p)      return UInt8GetDatum(p)
 #define PG_GETARG_DPS(n)      DatumGetUInt8(PG_GETARG_DATUM(n))
@@ -79,7 +79,7 @@ Datum postcode_out (PG_FUNCTION_ARGS) {
 PG_FUNCTION_INFO_V1(postcode_recv);
 
 Datum postcode_recv (PG_FUNCTION_ARGS) {
-   postcode p = pq_getmsgint((StringInfo) PG_GETARG_POINTER(0), sizeof(int32));
+   postcode p = pq_getmsgint((StringInfo) PG_GETARG_POINTER(0), sizeof(postcode));
 
    if (! postcode_binchk(p))
       ereport(ERROR, (errcode(ERRCODE_INVALID_BINARY_REPRESENTATION),
@@ -95,7 +95,7 @@ PG_FUNCTION_INFO_V1(postcode_send);
 Datum postcode_send (PG_FUNCTION_ARGS) {
    StringInfoData b;
    pq_begintypsend(&b);
-   pq_sendint(&b, PG_GETARG_POSTCODE(0), sizeof(int32));
+   pq_sendint(&b, PG_GETARG_POSTCODE(0), sizeof(postcode));
    PG_RETURN_BYTEA_P(pq_endtypsend(&b));
 }
 
