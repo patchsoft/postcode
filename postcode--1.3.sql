@@ -155,16 +155,17 @@ CREATE OPERATOR !% (
 
 CREATE OPERATOR FAMILY postcode_ops USING btree;
 
-CREATE OPERATOR CLASS postcode_ops DEFAULT
-FOR TYPE postcode USING btree FAMILY postcode_ops AS
-   OPERATOR 1 <  (postcode, postcode),
-   OPERATOR 2 <= (postcode, postcode),
-   OPERATOR 3 =  (postcode, postcode),
-   OPERATOR 4 >= (postcode, postcode),
-   OPERATOR 5 >  (postcode, postcode),
-   FUNCTION 1 postcode_cmp(postcode, postcode),
+CREATE OPERATOR CLASS postcode_ops
+DEFAULT FOR TYPE postcode USING btree FAMILY postcode_ops AS
+   OPERATOR 1 <,
+   OPERATOR 2 <=,
+   OPERATOR 3 =,
+   OPERATOR 4 >=,
+   OPERATOR 5 >,
+   FUNCTION 1 postcode_cmp(postcode, postcode);
 
-   OPERATOR 3 %  (postcode, text),
+ALTER OPERATOR FAMILY postcode_ops USING btree ADD
+   OPERATOR 3 % (postcode, text),
    FUNCTION 1 postcode_cmp_partial(postcode, text);
 
 
