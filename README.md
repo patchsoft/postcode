@@ -28,10 +28,10 @@ outward and inward codes.
 
 Rendering
 ---------
-When rendering postcodes to text the output buy by default will be in upper
-case with a single space between the outcode and incode. If an alternative
-format is required a to_char() function. The default output is equivalent to
-calling to_char(postcode, 'AD SW');
+When rendering postcodes to text the default output is upper case with a
+single space between the outcode and incode. If an alternative format is
+required a to_char() function is provided. The default output is equivalent
+to calling to_char(postcode, 'AD SW');
 
 
 Partial matching
