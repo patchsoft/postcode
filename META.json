@@ -1,0 +1,35 @@
+{
+   "name": "postcode",
+   "version": "1.3.0",
+   "abstract": "UK postcode type optimised for indexing",
+   "maintainer": "Dave Green <dgreen@patchsoft.co.uk>",
+   "license": "freebsd",
+   "release_status": "stable",
+   "description": "Parses and encodes UK postcodes in 32 bits optimised for indexing and partial matches. Also provides suitable type for delivery point suffixes.",
+   "tags": [ "postcode", "postal", "mail", "address", "delivery", "uk" ],
+   "meta-spec": {
+      "version": "1.0.0",
+      "url": "http://pgxn.org/meta/spec.txt"
+   },
+   "provides": {
+      "postcode": {
+         "abstract": "UK postcode type optimised for indexing",
+         "file": "postcode--1.3.0.sql",
+         "docfile": "readme.md",
+         "version": "1.3.0"
+      }
+   },
+   "resources": {
+      "homepage": "http://www.patchsoft.co.uk",
+      "bugtracker": {
+         "web": "http://github.com/patchsoft/postcode/issues"
+      },
+      "repository": {
+        "url":  "https://github.com/patchsoft/postcode.git",
+        "web":  "https://github.com/patchsoft/postcode",
+        "type": "git",
+      "x_twitter": "http://twitter.com/patchsoft/"
+      }
+   },
+   "generated_by": "Dave Green"
+}

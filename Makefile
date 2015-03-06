@@ -1,5 +1,5 @@
 EXTENSION    = postcode
-EXTVERSION   = 1.3
+EXTVERSION   = 1.3.0
 
 MODULE_big   = postcode
 OBJS         = postcode.o binfmt.o
