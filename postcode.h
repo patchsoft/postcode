@@ -14,7 +14,7 @@
 
 #define GET_BITS(var,pos,len)     ((var) >> (pos) & ((1<<(len))-1))
 #define CLR_BITS(var,pos,len)     ((var) &= ~(((1<<(len))-1)<<pos))
-#define SET_BITS(var,pos,len,set) ((var)=(var) &~ (((1<<(len))-1)<<pos) | ((set)<<(pos)))
+#define SET_BITS(var,pos,len,set) ((var) = ((var) &~ (((1<<(len))-1)<<pos)) | ((set)<<(pos)))
 
 #define GET_WALK2(p)       GET_BITS(p,  0, 5)
 #define GET_WALK1(p)       GET_BITS(p,  5, 5)
